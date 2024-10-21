@@ -1,0 +1,10 @@
+name: LoftyDailyRewards
+version: '1.0'
+main: tech.loftydev.loftyDailyRewards.LoftyDailyRewards
+api-version: '1.18'
+description: Daily Rewards System for Lofty
+
+commands:
+  dailyrewards:
+    aliases: [daily]
+    description: Access to Daily Rewards
