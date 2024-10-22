@@ -1,7 +1,8 @@
 package tech.loftydev.loftyDailyRewards.statics;
 
 import tech.loftydev.loftyDailyRewards.LoftyDailyRewards;
-import tech.loftydev.loftyDailyRewards.managers.DataManager;
+import tech.loftydev.loftyDailyRewards.interfaces.DataManager;
+import tech.loftydev.loftyDailyRewards.managers.DataManagerProvider;
 
 public class Bootstrapper {
 
@@ -19,7 +20,7 @@ public class Bootstrapper {
     public void initialize(LoftyDailyRewards core) {
         core.saveDefaultConfig();
 
-        this.dataManager = new DataManager(core);
+        this.dataManager = new DataManagerProvider(core);
     }
 
     public DataManager getDataManager() {
