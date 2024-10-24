@@ -68,6 +68,9 @@ public class DataManagerProvider implements DataManager {
     }
 
     @Override
+    public long getLastClaim(UUID playerId) { return getValue("last_claim", playerId); }
+
+    @Override
     public int getCurrentStreak(UUID playerId) {
         return (int) getValue("streak", playerId);
     }
@@ -92,7 +95,7 @@ public class DataManagerProvider implements DataManager {
 
     @Override
     public boolean canClaim(UUID playerId) {
-        long difference = System.currentTimeMillis() - getValue("last_claim", playerId);
+        long difference = System.currentTimeMillis() - getLastClaim(playerId);
 
         // If the difference is over 2 days, then the streak is reset.
         if (difference >= 172800000) {

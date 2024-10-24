@@ -28,7 +28,15 @@ public interface DataManager {
     * @param playerId the player's uuid
     * @param lastClaim the millisecond of the last claim.
      */
-    void setLastClaim(UUID playerId, long lastClaim);
+    void setLastClaim(UUID playerId, long lastClaim);    /*
+
+     * Get the player's last claim
+     *
+     * @param playerId the player's uuid
+     *
+     * @return the player's last claim
+     */
+    long getLastClaim(UUID playerId);
 
     /*
     * Get the player's current streak
