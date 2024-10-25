@@ -1,4 +1,4 @@
-package tech.loftydev.loftyDailyRewards.interfaces;
+package me.swiftens.loftyDailyRewards.interfaces;
 
 import java.sql.SQLException;
 import java.util.UUID;

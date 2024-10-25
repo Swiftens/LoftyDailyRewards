@@ -1,4 +1,4 @@
-package tech.loftydev.loftyDailyRewards.managers;
+package me.swiftens.loftyDailyRewards.managers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import tech.loftydev.loftyDailyRewards.LoftyDailyRewards;
-import tech.loftydev.loftyDailyRewards.enums.ItemType;
-import tech.loftydev.loftyDailyRewards.statics.TextUtils;
+import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
+import me.swiftens.loftyDailyRewards.enums.ItemType;
+import me.swiftens.loftyDailyRewards.utils.TextUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -53,10 +53,9 @@ public class GuiManager {
         if (page > 1) {
             slot = core.getConfig().getInt("gui.slots.previous_page");
             gui.setItem(slot, items.get(ItemType.PREVIOUS_PAGE));
-            slotList.remove(slot);
+            slotList.remove(Integer.valueOf(slot));
         }
 
-        // TODO: Do the days bruh, I'm so lost
         int slotSize = getDailyPageSize();
         int currentDay = (page * slotSize) - (slotSize - 1);
 
@@ -79,14 +78,13 @@ public class GuiManager {
             }
 
             currentDay++;
-            slotList.remove(slot);
+            slotList.remove(Integer.valueOf(slot));
         }
-
 
         if (page < getLastPage()) {
             slot = core.getConfig().getInt("gui.slots.next_page");
             gui.setItem(slot, items.get(ItemType.NEXT_PAGE));
-            slotList.remove(slot);
+            slotList.remove(Integer.valueOf(slot));
         }
 
         if (!getItem(ItemType.FRAME).getType().isAir()) {
@@ -96,6 +94,7 @@ public class GuiManager {
         }
 
         player.openInventory(gui);
+        pageList.put(player.getUniqueId(), page);
     }
 
     /*
@@ -122,6 +121,10 @@ public class GuiManager {
         return this.lastPage;
     }
 
+    public int getDailySlotFromIndex(int index) {
+        return slots.get(index);
+    }
+
     public int getPageFromStreak(int streak) {
         streak += 1;
         return (int) Math.ceil(((double) streak/ getDailyPageSize()));
@@ -141,8 +144,8 @@ public class GuiManager {
     }
 
     public void cacheItems() {
-        lastPage = (int) ((double) core.getConfig().getConfigurationSection("days").getKeys(false).size() / pageList.size());
         slots = core.getConfig().getIntegerList("gui.slots.daily");
+        lastPage = (int) Math.ceil((double) core.getConfig().getConfigurationSection("days").getKeys(false).size() / getDailyPageSize());
 
         ItemStack item;
         ItemMeta meta;

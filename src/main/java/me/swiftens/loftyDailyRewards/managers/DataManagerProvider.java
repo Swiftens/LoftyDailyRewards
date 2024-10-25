@@ -1,11 +1,13 @@
-package tech.loftydev.loftyDailyRewards.managers;
+package me.swiftens.loftyDailyRewards.managers;
 
-import tech.loftydev.loftyDailyRewards.LoftyDailyRewards;
-import tech.loftydev.loftyDailyRewards.interfaces.DataManager;
+import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
+import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class DataManagerProvider implements DataManager {
@@ -15,10 +17,13 @@ public class DataManagerProvider implements DataManager {
     private final LoftyDailyRewards core;
     private Connection connection;
 
+    // Cache getLastClaim because it can be called quite a lot.
+    private final Map<UUID, Long> lastClaimCache;
 
 
     public DataManagerProvider(LoftyDailyRewards core) {
         this.core = core;
+        this.lastClaimCache = new HashMap<>();
         File file = new File(core.getDataFolder(), "data.db");
         createFile(file);
 
@@ -34,7 +39,7 @@ public class DataManagerProvider implements DataManager {
 
     @Override
     public void setDefaultData(UUID playerId) {
-        String query = "INSERT OR IGNORE INTO" + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
+        String query = "INSERT OR IGNORE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
         try (PreparedStatement statement = connection.prepareStatement(query)){
             statement.setString(1, playerId.toString());
             statement.setInt(2, 0);
@@ -65,10 +70,13 @@ public class DataManagerProvider implements DataManager {
     @Override
     public void setLastClaim(UUID playerId, long lastClaim) {
         updateTable("last_claim", lastClaim, playerId);
+        lastClaimCache.put(playerId, lastClaim);
     }
 
     @Override
-    public long getLastClaim(UUID playerId) { return getValue("last_claim", playerId); }
+    public long getLastClaim(UUID playerId) {
+        return lastClaimCache.computeIfAbsent(playerId, id -> getValue("last_claim", id));
+    }
 
     @Override
     public int getCurrentStreak(UUID playerId) {
@@ -136,7 +144,7 @@ public class DataManagerProvider implements DataManager {
     }
 
     private void updateTable(String column, long value, UUID playerId) {
-        String query = "UPDATE " + TABLE_NAME + "set " + column + " = ? where playerId = ?";
+        String query = "UPDATE " + TABLE_NAME + " set " + column + " = ? where playerId = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, value);
             statement.setString(2, playerId.toString());

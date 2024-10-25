@@ -1,0 +1,16 @@
+prefix: "&7[&#c9e9f6&lDaily Rewards&7] "
+
+# These are the reminders sent to the player upon logging in.
+login-cant-claim: "&aYou can claim your rewards in &c{time}&a!"
+# If the player can claim, they are also reminded every "reminder-interval" in minutes that they can claim.
+can-claim: "&aYou can claim your daily reward!"
+
+commands:
+  config-reloaded: "&eConfig files reloaded!"
+  skip-successful: "&eSkipped waiting time for player."
+  streak-set-sucessful: "&eChanged player's current streak."
+  highest-streak-set-sucessful: "&eChanged player's highest streak."
+  player-only: "&cThis command is for players only!"
+  invalid-amount: "&cInvalid amount set! Must be an integer."
+  no-permission: "&cYou do not have the right permissions to run this command!"
+  invalid-player: "&cInvalid player name: {player}!"

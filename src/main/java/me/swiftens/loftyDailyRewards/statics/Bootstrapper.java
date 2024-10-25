@@ -1,9 +1,10 @@
-package tech.loftydev.loftyDailyRewards.statics;
+package me.swiftens.loftyDailyRewards.statics;
 
-import tech.loftydev.loftyDailyRewards.LoftyDailyRewards;
-import tech.loftydev.loftyDailyRewards.interfaces.DataManager;
-import tech.loftydev.loftyDailyRewards.managers.DataManagerProvider;
-import tech.loftydev.loftyDailyRewards.managers.GuiManager;
+import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
+import me.swiftens.loftyDailyRewards.interfaces.DataManager;
+import me.swiftens.loftyDailyRewards.managers.DataManagerProvider;
+import me.swiftens.loftyDailyRewards.managers.GuiManager;
+import me.swiftens.loftyDailyRewards.managers.MessageManager;
 
 public class Bootstrapper {
 
@@ -18,12 +19,18 @@ public class Bootstrapper {
 
     private DataManager dataManager;
     private GuiManager guiManager;
+    private MessageManager messageManager;
 
     public void initialize(LoftyDailyRewards core) {
         core.saveDefaultConfig();
 
+        this.messageManager = new MessageManager(core);
         this.dataManager = new DataManagerProvider(core);
         this.guiManager = new GuiManager(core);
+    }
+
+    public MessageManager getMessageManager() {
+        return messageManager;
     }
 
     public DataManager getDataManager() {

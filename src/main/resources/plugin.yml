@@ -1,10 +1,31 @@
 name: LoftyDailyRewards
 version: '1.0'
-main: tech.loftydev.loftyDailyRewards.LoftyDailyRewards
+main: me.swiftens.loftyDailyRewards.LoftyDailyRewards
 api-version: '1.18'
 description: Daily Rewards System for Lofty
 
 commands:
   dailyrewards:
-    aliases: [daily]
+    aliases: [daily, loftydailyrewards, loftydaily]
     description: Access to Daily Rewards
+
+permissions:
+  dailyrewards.*:
+    default: op
+    children:
+      dailyrewards.open: true
+      dailyrewards.reload: true
+      dailyrewards.set: true
+      dailyrewards.skip: true
+  dailyrewards.open:
+    description: Open the DailyRewards menu. If the player can does not have this permission, they will not be reminded that they can claim
+    default: true
+  dailyrewards.reload:
+    description: Access to reloading of config files.
+    default: op
+  dailyrewards.set:
+    description: Access to changing player data
+    default: op
+  dailyrewards.skip:
+    description: Allow players to skip waiting time
+    default: op

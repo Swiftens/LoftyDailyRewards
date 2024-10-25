@@ -1,4 +1,4 @@
-package tech.loftydev.loftyDailyRewards.statics;
+package me.swiftens.loftyDailyRewards.utils;
 
 import net.md_5.bungee.api.ChatColor;
 

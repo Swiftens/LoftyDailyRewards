@@ -1,4 +1,4 @@
-package tech.loftydev.loftyDailyRewards.enums;
+package me.swiftens.loftyDailyRewards.enums;
 
 public enum ItemType {
 

@@ -1,17 +1,19 @@
-package tech.loftydev.loftyDailyRewards.listeners;
+package me.swiftens.loftyDailyRewards.listeners;
 
+import me.swiftens.loftyDailyRewards.enums.MessageKeys;
+import me.swiftens.loftyDailyRewards.managers.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import tech.loftydev.loftyDailyRewards.LoftyDailyRewards;
-import tech.loftydev.loftyDailyRewards.interfaces.DataManager;
-import tech.loftydev.loftyDailyRewards.managers.GuiManager;
-import tech.loftydev.loftyDailyRewards.statics.TextUtils;
+import org.bukkit.event.player.PlayerJoinEvent;
+import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
+import me.swiftens.loftyDailyRewards.interfaces.DataManager;
+import me.swiftens.loftyDailyRewards.managers.GuiManager;
+import me.swiftens.loftyDailyRewards.utils.TextUtils;
 
 import java.util.UUID;
 
@@ -20,12 +22,30 @@ public class DailyRewardsListener implements Listener {
     private final GuiManager guiManager;
     private final DataManager dataManager;
     private final LoftyDailyRewards core;
+    private final MessageManager messageManager;
 
 
-    public DailyRewardsListener(LoftyDailyRewards core, GuiManager guiManager, DataManager dataManager) {
+    public DailyRewardsListener(LoftyDailyRewards core, MessageManager messageManager, GuiManager guiManager, DataManager dataManager) {
         this.core = core;
+        this.messageManager = messageManager;
         this.guiManager = guiManager;
         this.dataManager = dataManager;
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e) {
+        Player player = e.getPlayer();
+        dataManager.setDefaultData(player.getUniqueId());
+
+        if (player.hasPermission("dailyrewards.open")) {
+            if (dataManager.canClaim(player.getUniqueId())) {
+                messageManager.sendMessage(player, MessageKeys.REMINDER_CAN_CLAIM, null);
+            } else {
+                messageManager.sendMessage(player, MessageKeys.REMINDER_CANT_CLAIM,
+                        TextUtils.getTimeRemaining(dataManager.getLastClaim(player.getUniqueId()) + 86400000 - System.currentTimeMillis()));
+            }
+        }
+
     }
 
     @EventHandler
@@ -47,7 +67,7 @@ public class DailyRewardsListener implements Listener {
         }
 
         // Check if the player can claim and is the claimable slot.t
-        if (dataManager.canClaim(playerId) && page == guiManager.getPageFromStreak(streak) && slot == (streak % guiManager.getDailyPageSize())) {
+        if (dataManager.canClaim(playerId) && page == guiManager.getPageFromStreak(streak) && slot == guiManager.getDailySlotFromIndex(streak % guiManager.getDailyPageSize())) {
             int newStreak = streak + 1;
             dataManager.setCurrentStreak(playerId, newStreak);
             dataManager.setLastClaim(playerId, System.currentTimeMillis());

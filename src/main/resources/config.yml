@@ -1,8 +1,5 @@
+# How often to remind players that they can claim their daily rewards.
 reminder-interval: 10 #Set to -1 to disable, in minutes.
-
-messages:
-  login-cant-claim: "&7[&#c9e9f6&lDaily Rewards&7] &aYou can claim your rewards in &c%time%&a!"
-  can-claim: "&7[&#c9e9f6&lDaily Rewards&7] &aYou can claim your daily reward!"
 
 gui:
   name: "&#c9e9f6&lDaily Rewards"
@@ -18,7 +15,7 @@ gui:
 # This fills all the items that aren't put in slots.
     frame:
       name: "&#c9e9f6&lDaily Rewards"
-      type: "LIGHT_BLUE_STAINED_GLASS_PANE"
+      item: "LIGHT_BLUE_STAINED_GLASS_PANE"
 # This is the item that shows when the day can't be claimed and hasn't been claimed yet.
     unclaimed:
       name: "&dDay {day}"

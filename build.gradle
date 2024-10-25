@@ -1,8 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
+
 plugins {
     id 'java'
+    id "io.github.goooler.shadow" version "8.1.8"
 }
 
-group = 'tech.loftydev'
+group = 'me.swiftens'
 version = '1.0'
 
 repositories {
@@ -37,6 +40,12 @@ tasks.withType(JavaCompile).configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         options.release.set(targetJavaVersion)
     }
+}
+
+tasks.withType(ShadowJar).configureEach {
+
+    archiveFileName.set("LoftyDailyRewards-${project.version}.jar")
+
 }
 
 processResources {
