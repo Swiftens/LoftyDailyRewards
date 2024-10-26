@@ -79,6 +79,11 @@ public class DataManagerProvider implements DataManager {
     }
 
     @Override
+    public long getTimeRemaining(UUID playerId) {
+        return getLastClaim(playerId) + 86400000 - System.currentTimeMillis();
+    }
+
+    @Override
     public int getCurrentStreak(UUID playerId) {
         return (int) getValue("streak", playerId);
     }

@@ -1,5 +1,6 @@
 # How often to remind players that they can claim their daily rewards.
-reminder-interval: 10 #Set to -1 to disable, in minutes.
+# Set to -1 to disable, in minutes.
+reminder-interval: 10
 
 gui:
   name: "&#c9e9f6&lDaily Rewards"
@@ -16,6 +17,7 @@ gui:
     frame:
       name: "&#c9e9f6&lDaily Rewards"
       item: "LIGHT_BLUE_STAINED_GLASS_PANE"
+#     model-data: 3324394
 # This is the item that shows when the day can't be claimed and hasn't been claimed yet.
     unclaimed:
       name: "&dDay {day}"

@@ -1,6 +1,7 @@
 package me.swiftens.loftyDailyRewards;
 
 import me.swiftens.loftyDailyRewards.enums.MessageKeys;
+import me.swiftens.loftyDailyRewards.placeholders.DailyRewardsPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,6 +24,11 @@ public final class LoftyDailyRewards extends JavaPlugin {
         registerCommands();
         registerListeners();
         registerReminder();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new DailyRewardsPlaceholders(Bootstrapper.getInstance().getMessageManager(),
+                    Bootstrapper.getInstance().getDataManager()).register();
+        }
     }
 
     @Override

@@ -14,3 +14,7 @@ commands:
   invalid-amount: "&cInvalid amount set! Must be an integer."
   no-permission: "&cYou do not have the right permissions to run this command!"
   invalid-player: "&cInvalid player name: {player}!"
+
+placeholder:
+ # This is what returns on the placeholder "%dailyrewards_time_remaining%" when a player can claim.
+  can-claim: "Finished"

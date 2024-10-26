@@ -2,6 +2,7 @@ package me.swiftens.loftyDailyRewards.managers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -149,10 +150,14 @@ public class GuiManager {
 
         ItemStack item;
         ItemMeta meta;
+        ConfigurationSection section;
+
         for (ItemType type: ItemType.values()) {
-            item = new ItemStack(Material.valueOf(core.getConfig().getString(type.getKey() + ".item")), 1);
+            section = core.getConfig().getConfigurationSection(type.getKey());
+            item = new ItemStack(Material.valueOf(section.getString("item")), 1);
             meta = item.getItemMeta();
-            meta.setDisplayName(colorize(core.getConfig().getString(type.getKey() + ".name")));
+            meta.setDisplayName(colorize(section.getString("name")));
+            if (section.contains("model-data")) meta.setCustomModelData(section.getInt("model-data"));
             item.setItemMeta(meta);
 
             items.put(type, item);

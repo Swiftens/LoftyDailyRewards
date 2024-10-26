@@ -53,7 +53,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
             if (hasNoPermission(sender, "dailyrewards.reload")) return;
             int streak = dataManager.getCurrentStreak(playerId);
             guiManager.openGui(player, guiManager.getPageFromStreak(streak), streak + 1, dataManager.canClaim(playerId),
-                    TextUtils.getTimeRemaining(dataManager.getLastClaim(playerId) + 86400000 - System.currentTimeMillis()), streak);
+                    TextUtils.getTimeRemaining(dataManager.getTimeRemaining(playerId)), streak);
         } else {
             messageManager.sendMessage(sender, MessageKeys.COMMAND_PLAYER_ONLY, null);
 

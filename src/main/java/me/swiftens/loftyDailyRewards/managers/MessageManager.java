@@ -53,6 +53,10 @@ public class MessageManager {
         sender.sendMessage(message);
     }
 
+    public String getCanClaimPlaceholder() {
+        return TextUtils.translateHexCodes(messages.getFile().getString("placeholder.can-claim", "Finished"));
+    }
+
 
 
     public void reload() {

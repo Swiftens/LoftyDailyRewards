@@ -3,6 +3,8 @@ version: '1.0'
 main: me.swiftens.loftyDailyRewards.LoftyDailyRewards
 api-version: '1.18'
 description: Daily Rewards System for Lofty
+softdepend:
+  - PlaceholderAPI
 
 commands:
   dailyrewards:

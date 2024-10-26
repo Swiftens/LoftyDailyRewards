@@ -42,7 +42,7 @@ public class DailyRewardsListener implements Listener {
                 messageManager.sendMessage(player, MessageKeys.REMINDER_CAN_CLAIM, null);
             } else {
                 messageManager.sendMessage(player, MessageKeys.REMINDER_CANT_CLAIM,
-                        TextUtils.getTimeRemaining(dataManager.getLastClaim(player.getUniqueId()) + 86400000 - System.currentTimeMillis()));
+                        TextUtils.getTimeRemaining(dataManager.getTimeRemaining(player.getUniqueId())));
             }
         }
 
@@ -89,7 +89,7 @@ public class DailyRewardsListener implements Listener {
 
     private void openGui(Player player, UUID playerId, int page, int streak) {
         guiManager.openGui(player, page,streak + 1, dataManager.canClaim(playerId),
-                TextUtils.getTimeRemaining(dataManager.getLastClaim(playerId) + 86400000 - System.currentTimeMillis()), streak);
+                TextUtils.getTimeRemaining(dataManager.getTimeRemaining(playerId)), streak);
     }
 
 }
