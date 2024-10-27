@@ -2,9 +2,8 @@ package me.swiftens.loftyDailyRewards.statics;
 
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
-import me.swiftens.loftyDailyRewards.managers.DataManagerProvider;
-import me.swiftens.loftyDailyRewards.managers.GuiManager;
-import me.swiftens.loftyDailyRewards.managers.MessageManager;
+import me.swiftens.loftyDailyRewards.managers.*;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 
 public class Bootstrapper {
 
@@ -17,16 +16,29 @@ public class Bootstrapper {
         return INSTANCE;
     }
 
-    private DataManager dataManager;
-    private GuiManager guiManager;
+    private ConfigManager configManager;
+    private RewardsManager rewardsManager;
     private MessageManager messageManager;
 
-    public void initialize(LoftyDailyRewards core) {
-        core.saveDefaultConfig();
+    private DataManager dataManager;
+    private GuiManager guiManager;
 
-        this.messageManager = new MessageManager(core);
+    public void initialize(LoftyDailyRewards core) {
+        BukkitAudiences audiences = BukkitAudiences.create(core);
+
+        this.configManager = new ConfigManager(core);
+        this.messageManager = new MessageManager(core, audiences);
+        this.rewardsManager = new RewardsManager(core, configManager);
+        this.guiManager = new GuiManager(configManager, rewardsManager);
         this.dataManager = new DataManagerProvider(core);
-        this.guiManager = new GuiManager(core);
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public RewardsManager getRewardsManager() {
+        return rewardsManager;
     }
 
     public MessageManager getMessageManager() {

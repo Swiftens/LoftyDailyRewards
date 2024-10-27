@@ -2,7 +2,10 @@ package me.swiftens.loftyDailyRewards.commands;
 
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.enums.MessageKeys;
+import me.swiftens.loftyDailyRewards.managers.ConfigManager;
 import me.swiftens.loftyDailyRewards.managers.MessageManager;
+import me.swiftens.loftyDailyRewards.managers.RewardsManager;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,23 +19,24 @@ import java.util.UUID;
 
 public class DailyRewardsExecutor implements CommandExecutor {
 
-    private final LoftyDailyRewards core;
+    private final ConfigManager config;
     private final GuiManager guiManager;
     private final DataManager dataManager;
     private final MessageManager messageManager;
+    private final RewardsManager rewardsManager;
 
-    public DailyRewardsExecutor(LoftyDailyRewards core, MessageManager messageManager, GuiManager guiManager, DataManager dataManager) {
-        this.core = core;
+    public DailyRewardsExecutor(ConfigManager configManager, MessageManager messageManager, GuiManager guiManager, DataManager dataManager, RewardsManager rewardsManager) {
+        this.config = configManager;
         this.messageManager = messageManager;
         this.guiManager = guiManager;
         this.dataManager = dataManager;
+        this.rewardsManager = rewardsManager;
     }
 
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         // Open the Daily Rewards GUI
-
         if (strings.length == 0) {
             handleNoArgs(commandSender);
             return true;
@@ -48,24 +52,30 @@ public class DailyRewardsExecutor implements CommandExecutor {
 
     private void handleNoArgs(CommandSender sender) {
         UUID playerId;
+        int day;
         if (sender instanceof Player player) {
             playerId = player.getUniqueId();
-            if (hasNoPermission(sender, "dailyrewards.reload")) return;
-            int streak = dataManager.getCurrentStreak(playerId);
-            guiManager.openGui(player, guiManager.getPageFromStreak(streak), streak + 1, dataManager.canClaim(playerId),
-                    TextUtils.getTimeRemaining(dataManager.getTimeRemaining(playerId)), streak);
-        } else {
-            messageManager.sendMessage(sender, MessageKeys.COMMAND_PLAYER_ONLY, null);
+            if (hasNoPermission(sender, "dailyrewards.open")) return;
 
+            day = rewardsManager.getDay(dataManager.getCurrentStreak(playerId));
+
+            guiManager.openGui(player, guiManager.getPageFromDay(day), day, dataManager.canClaim(playerId),
+                    config.getWaitingTime(dataManager.getTimeRemaining(playerId)));
+        } else {
+            messageManager.simpleMessage(sender, MessageKeys.COMMAND_PLAYER_ONLY);
         }
     }
 
     private void handleSingleArg(CommandSender sender, String argument) {
         if (argument.equalsIgnoreCase("reload")) {
             if (hasNoPermission(sender, "dailyrewards.reload")) return;
-            core.reloadConfig();
+            config.reload();
+            rewardsManager.reload();
             messageManager.reload();
-        } else {
+            messageManager.simpleMessage(sender, MessageKeys.COMMAND_CONFIG_RELOADED);
+        } else if (argument.equalsIgnoreCase("open")) {
+            handleNoArgs(sender);
+        }else {
             manageHelpMessage(sender);
         }
     }
@@ -75,30 +85,33 @@ public class DailyRewardsExecutor implements CommandExecutor {
         UUID playerId;
         switch (args[0].toLowerCase()) {
             case "skip" -> {
+                if (hasNoPermission(sender, "dailyrewards.skip")) return;
                 player = getPlayer(sender, args[1]);
                 if (player == null) return;
                 playerId = player.getUniqueId();
                 dataManager.setLastClaim(playerId, System.currentTimeMillis() - 86400000);
-                messageManager.sendMessage(sender, MessageKeys.COMMAND_SKIP_SUCCESSFUL, null);
+                messageManager.simpleMessage(sender, MessageKeys.COMMAND_SKIP_SUCCESSFUL);
+                messageManager.remindCanClaim(player);
             }
             case "set" -> {
-                player = getPlayer(sender, args[1]);
+                if (hasNoPermission(sender, "dailyrewards.set")) return;
+                player = getPlayer(sender, args[2]);
                 if (player == null) return;
                 playerId = player.getUniqueId();
 
                 try {
                     int amount = Integer.parseInt(args[3]);
-                    if (args[2].equalsIgnoreCase("streak")) {
+                    if (args[1].equalsIgnoreCase("streak")) {
                         dataManager.setCurrentStreak(playerId, amount);
-                        messageManager.sendMessage(sender, MessageKeys.COMMAND_STREAK_SUCCESSFUL, null);
-                    } else if (args[2].equalsIgnoreCase("higheststreak")) {
+                        messageManager.messageChange(sender, player, amount, false);
+                    } else if (args[1].equalsIgnoreCase("higheststreak")) {
                         dataManager.setHighestStreak(playerId, amount);
-                        messageManager.sendMessage(sender, MessageKeys.COMMAND_HIGHEST_STREAK_SUCCESSFUL, null);
+                        messageManager.messageChange(sender, player, amount, true);
                     } else {
                         manageHelpMessage(sender);
                     }
                 } catch (NumberFormatException e) {
-                    messageManager.sendMessage(sender, MessageKeys.COMMAND_INVALID_AMOUNT, null);
+                    messageManager.simpleMessage(sender, MessageKeys.COMMAND_INVALID_AMOUNT);
                 }
 
             }
@@ -117,7 +130,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
      */
     private boolean hasNoPermission(CommandSender sender, String permission) {
         if (!sender.hasPermission(permission)) {
-            messageManager.sendMessage(sender, MessageKeys.COMMAND_NO_PERMISSION, null);
+            messageManager.simpleMessage(sender, MessageKeys.COMMAND_NO_PERMISSION);
             return true;
         }
         return false;
@@ -126,7 +139,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
     private Player getPlayer(CommandSender sender, String name) {
         Player player = Bukkit.getPlayer(name);
         if (player == null) {
-            messageManager.sendMessage(sender, MessageKeys.COMMAND_INVALID_PLAYER, null);
+            messageManager.simpleMessage(sender, MessageKeys.COMMAND_INVALID_PLAYER);
             return null;
         }
         return player;
@@ -134,33 +147,35 @@ public class DailyRewardsExecutor implements CommandExecutor {
 
     private static final String[] BASE_HELP_MESSAGES = {
             "&e---- &bLoftyDailyRewards &e----",
-            "&b[] - Optional&f, &e<> - Required",
+            "&b[] - Optional&f, &a<> - Required",
             "&e/dailyrewards help",
             "&r &r Shows this list"
     };
 
     private void manageHelpMessage(CommandSender sender) {
         for (String message : BASE_HELP_MESSAGES) {
-            sender.sendMessage(TextUtils.translateHexCodes(message));
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
 
+        String reset = ChatColor.RESET + " " + ChatColor.RESET + " ";
+
         if (sender.hasPermission("dailyrewards.open")) {
-            sender.sendMessage(TextUtils.translateHexCodes("&e/dailyrewards &b[open]"));
-            sender.sendMessage(TextUtils.translateHexCodes("&r &r Open the DailyRewards GUI"));
+            sender.sendMessage(ChatColor.YELLOW + "/dailyrewards " + ChatColor.AQUA + "[open]");
+            sender.sendMessage(reset + "Open the DailyRewards GUI");
         }
         if (sender.hasPermission("dailyrewards.reload")) {
-            sender.sendMessage(TextUtils.translateHexCodes("&e/dailyrewards reload"));
-            sender.sendMessage(TextUtils.translateHexCodes("&r &r Reload the configuration files"));
+            sender.sendMessage(ChatColor.YELLOW + "/dailyrewards reload");
+            sender.sendMessage(reset + "Reload the configuration files");
         }
         if (sender.hasPermission("dailyrewards.skip")) {
-            sender.sendMessage(TextUtils.translateHexCodes("&e/dailyrewards skip"));
-            sender.sendMessage(TextUtils.translateHexCodes("&r &r Allow the player to claim as if it's the next day"));
+            sender.sendMessage(ChatColor.YELLOW + "/dailyrewards skip " + ChatColor.GREEN + "<player>");
+            sender.sendMessage(reset + "Allow the player to claim as if it's the next day");
         }
         if (sender.hasPermission("dailyrewards.set")) {
-            sender.sendMessage(TextUtils.translateHexCodes("&e/dailyrewards set <player> streak <amount>"));
-            sender.sendMessage(TextUtils.translateHexCodes("&r &r Change the player's current streak"));
-            sender.sendMessage(TextUtils.translateHexCodes("&e/dailyrewards set <player> higheststreak <amount>"));
-            sender.sendMessage(TextUtils.translateHexCodes("&r &r Change the player's highest streak"));
+            sender.sendMessage(ChatColor.YELLOW + "/dailyrewards set streak " + ChatColor.GREEN + "<player> <amount>");
+            sender.sendMessage(reset + "Change the player's current streak");
+            sender.sendMessage(ChatColor.YELLOW + "/dailyrewards set higheststreak " + ChatColor.GREEN +  "<player> <amount>");
+            sender.sendMessage(reset + "Change the player's highest streak");
         }
 
     }

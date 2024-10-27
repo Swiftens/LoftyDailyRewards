@@ -1,13 +1,11 @@
 package me.swiftens.loftyDailyRewards.managers;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.enums.ItemType;
 import me.swiftens.loftyDailyRewards.utils.TextUtils;
 
@@ -17,23 +15,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class GuiManager {
 
-    private final LoftyDailyRewards core;
-    private final Map<ItemType, ItemStack> items;
+    private final ConfigManager config;
+    private final RewardsManager rewardsManager;
     private final Map<UUID, Integer> pageList;
 
-    private List<Integer> slots;
-    private int lastPage;
 
-    public GuiManager(LoftyDailyRewards core) {
-        this.core = core;
-        items = new HashMap<>();
+    public GuiManager(ConfigManager config, RewardsManager rewardsManager) {
+        this.config = config;
+        this.rewardsManager = rewardsManager;
         pageList = new HashMap<>();
 
-        cacheItems();
     }
     /*
     * Open the Daily GUI for the player
@@ -45,52 +39,61 @@ public class GuiManager {
     * @param time the remaining time in string format
     * @param streak the player's current streak
      */
-    public void openGui(Player player, int page, int day, boolean canClaim, String time, int streak) {
-        int size = core.getConfig().getInt("gui.size");
+    public void openGui(Player player, int page, int day, boolean canClaim, String time) {
+        int size = config.getInt("gui.size");
         int slot;
+        ItemStack item;
+        List<String> dayLore;
         List<Integer> slotList = IntStream.range(0, size).boxed().collect(Collectors.toList());
-        Inventory gui = Bukkit.createInventory(null, size, colorize(core.getConfig().getString("gui.name")));
+        Inventory gui = Bukkit.createInventory(null, size, config.getGuiName());
 
         if (page > 1) {
-            slot = core.getConfig().getInt("gui.slots.previous_page");
-            gui.setItem(slot, items.get(ItemType.PREVIOUS_PAGE));
+            slot = config.getInt("gui.slots.previous_page");
+            gui.setItem(slot, config.getItem(ItemType.PREVIOUS_PAGE));
             slotList.remove(Integer.valueOf(slot));
         }
 
-        int slotSize = getDailyPageSize();
+        int slotSize = config.getDailySlotSize();
         int currentDay = (page * slotSize) - (slotSize - 1);
 
         for (int i = 0; i < slotSize; i++) {
-            slot = slots.get(i);
+            slot = config.getDailySlotFromIndex(i);
+
+            dayLore = rewardsManager.getLore(currentDay).stream()
+                    .map(s -> TextUtils.translateHexCodes(PlaceholderAPI.setPlaceholders(player, s)))
+                    .toList();
 
             // This day has been claimed already.
-            if (currentDay <= streak) {
-                gui.setItem(slot, getItem(ItemType.CLAIMED, currentDay, time));
+            if (currentDay < day) {
+                item = getItem(ItemType.CLAIMED, currentDay, time, dayLore);
+                gui.setItem(slot, getItem(ItemType.CLAIMED, currentDay, time, dayLore));
                 // This day can not be claimed because it has not reached the streak
-            } else if (currentDay > streak + 1) {
-                gui.setItem(slot, getItem(ItemType.UNCLAIMED, currentDay, time));
+            } else if (currentDay > day) {
+                item = getItem(ItemType.UNCLAIMED, currentDay, time, dayLore);
             } else {
                 // This day can be claimed and is the day that needs to be claimed.
                 if (canClaim) {
-                    gui.setItem(slot, getItem(ItemType.CLAIMABLE, currentDay, time));
+                    item = getItem(ItemType.CLAIMABLE, currentDay, time, dayLore);
                 } else {
-                    gui.setItem(slot, getItem(ItemType.UNCLAIMABLE, currentDay, time));
+                    item = getItem(ItemType.UNCLAIMABLE, currentDay, time, dayLore);
                 }
             }
 
+            gui.setItem(slot, item);
             currentDay++;
             slotList.remove(Integer.valueOf(slot));
         }
 
-        if (page < getLastPage()) {
-            slot = core.getConfig().getInt("gui.slots.next_page");
-            gui.setItem(slot, items.get(ItemType.NEXT_PAGE));
+        if (page < rewardsManager.getLastPage()) {
+            slot = config.getInt("gui.slots.next_page");
+            gui.setItem(slot, config.getItem(ItemType.NEXT_PAGE));
             slotList.remove(Integer.valueOf(slot));
         }
 
-        if (!getItem(ItemType.FRAME).getType().isAir()) {
+        item = config.getItem(ItemType.FRAME);
+        if (!item.getType().isAir()) {
             for (int i: slotList) {
-                gui.setItem(i, getItem(ItemType.FRAME));
+                gui.setItem(i, item);
             }
         }
 
@@ -114,72 +117,25 @@ public class GuiManager {
         pageList.remove(playerId);
     }
 
-    public int getDailyPageSize() {
-        return slots.size();
+    /*
+    * Assumes that the day has already been calculated.
+     */
+    public int getPageFromDay(int day) {
+        return (int) Math.ceil((double) day / config.getDailySlotSize());
     }
 
-    public int getLastPage() {
-        return this.lastPage;
-    }
-
-    public int getDailySlotFromIndex(int index) {
-        return slots.get(index);
-    }
-
-    public int getPageFromStreak(int streak) {
-        streak += 1;
-        return (int) Math.ceil(((double) streak/ getDailyPageSize()));
-    }
-
-    private ItemStack getItem(ItemType type, int day, String time) {
-        ItemStack item = new ItemStack(getItem(type));
+    private ItemStack getItem(ItemType type, int day, String time, List<String> dayLore) {
+        ItemStack item = config.getItem(type, day, time);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(meta.getDisplayName().replace("{day}", String.valueOf(day)));
-        meta.setLore(getLore(type, day, time));
+
+        List<String> lore = meta.getLore();
+        lore.addAll(dayLore);
+
+        meta.setLore(lore);
+
         item.setItemMeta(meta);
         return item;
     }
 
-    private ItemStack getItem(ItemType type) {
-        return items.get(type);
-    }
-
-    public void cacheItems() {
-        slots = core.getConfig().getIntegerList("gui.slots.daily");
-        lastPage = (int) Math.ceil((double) core.getConfig().getConfigurationSection("days").getKeys(false).size() / getDailyPageSize());
-
-        ItemStack item;
-        ItemMeta meta;
-        ConfigurationSection section;
-
-        for (ItemType type: ItemType.values()) {
-            section = core.getConfig().getConfigurationSection(type.getKey());
-            item = new ItemStack(Material.valueOf(section.getString("item")), 1);
-            meta = item.getItemMeta();
-            meta.setDisplayName(colorize(section.getString("name")));
-            if (section.contains("model-data")) meta.setCustomModelData(section.getInt("model-data"));
-            item.setItemMeta(meta);
-
-            items.put(type, item);
-        }
-
-    }
-
-    private List<String> getLore(ItemType type, int day, String time) {
-        List<String> lore =  Stream.concat(
-                core.getConfig().getStringList(type.getKey() + ".lore").stream(),
-                core.getConfig().getStringList("days." + day + ".lore").stream()
-        ).toList();
-
-        return lore.stream()
-                .map(l -> colorize(l)
-                        .replace("{time}", time)
-                        .replace("{day}", String.valueOf(day)))
-                .toList();
-    }
-
-    private String colorize(String text) {
-        return TextUtils.translateHexCodes(text);
-    }
 
 }

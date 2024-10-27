@@ -80,6 +80,7 @@ public class DataManagerProvider implements DataManager {
 
     @Override
     public long getTimeRemaining(UUID playerId) {
+        if (canClaim(playerId)) return -1;
         return getLastClaim(playerId) + 86400000 - System.currentTimeMillis();
     }
 

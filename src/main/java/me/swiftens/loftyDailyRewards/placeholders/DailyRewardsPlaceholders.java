@@ -2,6 +2,7 @@ package me.swiftens.loftyDailyRewards.placeholders;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
+import me.swiftens.loftyDailyRewards.managers.ConfigManager;
 import me.swiftens.loftyDailyRewards.managers.MessageManager;
 import me.swiftens.loftyDailyRewards.utils.TextUtils;
 import org.bukkit.OfflinePlayer;
@@ -13,10 +14,12 @@ public class DailyRewardsPlaceholders extends PlaceholderExpansion {
 
     private final DataManager dataManager;
     private final MessageManager messageManager;
+    private final ConfigManager config;
 
-    public DailyRewardsPlaceholders(MessageManager messageManager, DataManager dataManager) {
+    public DailyRewardsPlaceholders(MessageManager messageManager, DataManager dataManager, ConfigManager configManager) {
         this.messageManager = messageManager;
         this.dataManager = dataManager;
+        this.config = configManager;
     }
 
     @Override
@@ -38,18 +41,13 @@ public class DailyRewardsPlaceholders extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, String params) {
         UUID playerId = player.getUniqueId();
 
-        switch (params.toLowerCase()) {
-            case "current_streak": return String.valueOf(dataManager.getCurrentStreak(playerId));
-            case "highest_streak": return String.valueOf(dataManager.getHighestStreak(playerId));
-            case "time_remaining":
-                if (dataManager.canClaim(playerId)) {
-                    return messageManager.getCanClaimPlaceholder();
-                } else {
-                    return TextUtils.getTimeRemaining(dataManager.getTimeRemaining(playerId));
-                }
-        }
+        return switch (params.toLowerCase()) {
+            case "current_streak" -> String.valueOf(dataManager.getCurrentStreak(playerId));
+            case "highest_streak" -> String.valueOf(dataManager.getHighestStreak(playerId));
+            case "time_remaining" -> config.getWaitingTime(dataManager.getTimeRemaining(playerId));
+            default -> null;
+        };
 
-        return null;
     }
 
 }

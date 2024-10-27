@@ -1,7 +1,9 @@
 package me.swiftens.loftyDailyRewards.listeners;
 
 import me.swiftens.loftyDailyRewards.enums.MessageKeys;
+import me.swiftens.loftyDailyRewards.managers.ConfigManager;
 import me.swiftens.loftyDailyRewards.managers.MessageManager;
+import me.swiftens.loftyDailyRewards.managers.RewardsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,17 +21,18 @@ import java.util.UUID;
 
 public class DailyRewardsListener implements Listener {
 
+    private final ConfigManager config;
     private final GuiManager guiManager;
     private final DataManager dataManager;
-    private final LoftyDailyRewards core;
     private final MessageManager messageManager;
+    private final RewardsManager rewardsManager;
 
-
-    public DailyRewardsListener(LoftyDailyRewards core, MessageManager messageManager, GuiManager guiManager, DataManager dataManager) {
-        this.core = core;
+    public DailyRewardsListener(ConfigManager config, MessageManager messageManager, GuiManager guiManager, DataManager dataManager, RewardsManager rewardsManager) {
+        this.config = config;
         this.messageManager = messageManager;
         this.guiManager = guiManager;
         this.dataManager = dataManager;
+        this.rewardsManager = rewardsManager;
     }
 
     @EventHandler
@@ -39,10 +42,9 @@ public class DailyRewardsListener implements Listener {
 
         if (player.hasPermission("dailyrewards.open")) {
             if (dataManager.canClaim(player.getUniqueId())) {
-                messageManager.sendMessage(player, MessageKeys.REMINDER_CAN_CLAIM, null);
+                messageManager.remindCanClaim(player);
             } else {
-                messageManager.sendMessage(player, MessageKeys.REMINDER_CANT_CLAIM,
-                        TextUtils.getTimeRemaining(dataManager.getTimeRemaining(player.getUniqueId())));
+                messageManager.remindCantClaim(player, config.getWaitingTime(dataManager.getTimeRemaining(player.getUniqueId())));
             }
         }
 
@@ -50,6 +52,8 @@ public class DailyRewardsListener implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
+        int newStreak, newDay, broadcastDifference = config.getInt("broadcast-difference");
+        boolean broadcast;
         Player player = (Player) e.getWhoClicked();
         UUID playerId = player.getUniqueId();
         int slot = e.getRawSlot();
@@ -57,27 +61,32 @@ public class DailyRewardsListener implements Listener {
         if (page == 0) return;
         e.setCancelled(true);
         int streak = dataManager.getCurrentStreak(playerId);
+        int day = rewardsManager.getDay(streak);
 
-        if (page > 1 && slot == core.getConfig().getInt("gui.slots.previous_page")) {
-            openGui(player, playerId, page - 1, streak);
+        if (page > 1 && slot == config.getInt("gui.slots.previous_page")) {
+            openGui(player, playerId, page - 1, day);
         }
 
-        if (page < guiManager.getLastPage() && slot == core.getConfig().getInt("gui.slots.next_page")) {
-            openGui(player, playerId, page + 1, streak);
+        if (page < rewardsManager.getLastPage() && slot == config.getInt("gui.slots.next_page")) {
+            openGui(player, playerId, page + 1, day);
         }
 
-        // Check if the player can claim and is the claimable slot.t
-        if (dataManager.canClaim(playerId) && page == guiManager.getPageFromStreak(streak) && slot == guiManager.getDailySlotFromIndex(streak % guiManager.getDailyPageSize())) {
-            int newStreak = streak + 1;
+        // Check if the player can claim and is the claimable slot.
+        if (dataManager.canClaim(playerId)
+                && page == guiManager.getPageFromDay(day)
+                && slot == config.getDailySlotFromIndex(streak % config.getDailySlotSize())) {
+            newStreak = streak + 1;
             dataManager.setCurrentStreak(playerId, newStreak);
             dataManager.setLastClaim(playerId, System.currentTimeMillis());
 
-            CommandSender console = Bukkit.getConsoleSender();
-            for (String command: core.getConfig().getStringList("days." + newStreak + ".rewards")) {
-                Bukkit.dispatchCommand(console, command.replace("{player}", player.getName()));
-            }
+            rewardsManager.runRewards(player, day);
 
-            openGui(player, playerId, guiManager.getPageFromStreak(newStreak), newStreak);
+            // Broadcast stuffs
+            broadcast = broadcastDifference > 0 && newStreak % broadcastDifference == 0;
+            messageManager.messageClaim(player, newStreak, broadcast);
+
+            newDay = rewardsManager.getDay(day);
+            openGui(player, playerId, guiManager.getPageFromDay(newDay), newDay);
         }
 
     }
@@ -87,9 +96,9 @@ public class DailyRewardsListener implements Listener {
         guiManager.removePlayerFromGui(e.getPlayer().getUniqueId());
     }
 
-    private void openGui(Player player, UUID playerId, int page, int streak) {
-        guiManager.openGui(player, page,streak + 1, dataManager.canClaim(playerId),
-                TextUtils.getTimeRemaining(dataManager.getTimeRemaining(playerId)), streak);
+    private void openGui(Player player, UUID playerId, int page, int day) {
+        guiManager.openGui(player, page,day, dataManager.canClaim(playerId),
+                config.getWaitingTime(dataManager.getTimeRemaining(playerId)));
     }
 
 }

@@ -1,6 +1,8 @@
 package me.swiftens.loftyDailyRewards;
 
 import me.swiftens.loftyDailyRewards.enums.MessageKeys;
+import me.swiftens.loftyDailyRewards.interfaces.DataManager;
+import me.swiftens.loftyDailyRewards.managers.MessageManager;
 import me.swiftens.loftyDailyRewards.placeholders.DailyRewardsPlaceholders;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,7 +29,8 @@ public final class LoftyDailyRewards extends JavaPlugin {
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new DailyRewardsPlaceholders(Bootstrapper.getInstance().getMessageManager(),
-                    Bootstrapper.getInstance().getDataManager()).register();
+                    Bootstrapper.getInstance().getDataManager(),
+                    Bootstrapper.getInstance().getConfigManager()).register();
         }
     }
 
@@ -47,16 +50,21 @@ public final class LoftyDailyRewards extends JavaPlugin {
     }
 
     private void registerCommands() {
-        getCommand("dailyrewards").setExecutor(new DailyRewardsExecutor(this, Bootstrapper.getInstance().getMessageManager(),
-                Bootstrapper.getInstance().getGuiManager(),
-                Bootstrapper.getInstance().getDataManager()));
+        Bootstrapper instance = Bootstrapper.getInstance();
+        getCommand("dailyrewards").setExecutor(new DailyRewardsExecutor(instance.getConfigManager(),
+                instance.getMessageManager(),
+                instance.getGuiManager(),
+                instance.getDataManager(),
+                instance.getRewardsManager()));
     }
 
     private void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(new DailyRewardsListener(this,
-                Bootstrapper.getInstance().getMessageManager(),
-                Bootstrapper.getInstance().getGuiManager(),
-                Bootstrapper.getInstance().getDataManager()), this);
+        Bootstrapper instance = Bootstrapper.getInstance();
+        Bukkit.getPluginManager().registerEvents(new DailyRewardsListener(instance.getConfigManager(),
+                instance.getMessageManager(),
+                instance.getGuiManager(),
+                instance.getDataManager(),
+                instance.getRewardsManager()), this);
     }
 
     private void registerReminder() {
@@ -66,10 +74,11 @@ public final class LoftyDailyRewards extends JavaPlugin {
             reminder = new BukkitRunnable() {
                 @Override
                 public void run() {
+                    DataManager dataManager = Bootstrapper.getInstance().getDataManager();
+                    MessageManager messageManager = Bootstrapper.getInstance().getMessageManager();
                     for (Player player: Bukkit.getOnlinePlayers()) {
-                        if (player.hasPermission("dailyrewards.open") && Bootstrapper.getInstance().getDataManager().canClaim(player.getUniqueId())) {
-                            Bootstrapper.getInstance().getMessageManager()
-                                    .sendMessage(player, MessageKeys.REMINDER_CAN_CLAIM, null);
+                        if (dataManager.canClaim(player.getUniqueId()) && player.hasPermission("dailyrewards.open")) {
+                            messageManager.remindCanClaim(player);
                         }
                     }
                 }

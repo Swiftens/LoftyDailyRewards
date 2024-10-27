@@ -45,6 +45,7 @@ public interface DataManager {
     * @param playerId the player's uuid
     *
     * @return the time remaining in milliseconds
+    *         -1 if the player can claim
      */
     long getTimeRemaining(UUID playerId);
 

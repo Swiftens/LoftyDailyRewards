@@ -2,22 +2,36 @@
 # Set to -1 to disable, in minutes.
 reminder-interval: 10
 
+# How many days before a broadcast is called. Ex. (every 10 days)
+# Set to 1 for every day, set to 0 for never.
+broadcast-difference: 10
+
+time-remaining:
+  can-claim: "Finished"
+# %h - The number of hours remaining, %m - The number of minutes remaining, %s - The number of seconds remaining
+  waiting: "%hh %mm %ss"
+
 gui:
+
   name: "&#c9e9f6&lDaily Rewards"
-  # 9,18,27,36,45,54
+
+# 9,18,27,36,45,54
   size: 9
+
+# Slots start at 0.
   slots:
     # The size of this list is the amount of daily rewards that are put per page.
     daily: [2,3,4,5,6]
     previous_page: 0
     next_page: 8
+
   items:
 # Set to air to remove.
 # This fills all the items that aren't put in slots.
     frame:
       name: "&#c9e9f6&lDaily Rewards"
       item: "LIGHT_BLUE_STAINED_GLASS_PANE"
-#     model-data: 3324394
+#      model-data: 3324394
 # This is the item that shows when the day can't be claimed and hasn't been claimed yet.
     unclaimed:
       name: "&dDay {day}"
@@ -61,307 +75,3 @@ gui:
     previous_page:
       name: "&6Previous Page"
       item: "ARROW"
-
-# Every day!!
-# Literally, has no limit. Add as many days as you want.
-days:
-  1:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  2:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  3:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  4:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  5:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  6:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  7:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  8:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  9:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  10:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  11:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  12:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  13:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  14:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  15:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  16:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  17:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  18:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  19:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  20:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  21:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  22:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  23:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  24:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  25:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  26:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  27:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  28:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  29:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  30:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  31:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  32:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  33:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  34:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  35:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  36:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  37:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  38:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  39:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  40:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  41:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  42:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  43:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  44:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  45:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  46:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  47:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  48:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  49:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  50:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  51:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  52:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  53:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  54:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  55:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  56:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  57:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  58:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  59:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'
-  60:
-    lore:
-      - '&7- &a$2,000'
-    rewards:
-      - 'eco give {player} 2000'

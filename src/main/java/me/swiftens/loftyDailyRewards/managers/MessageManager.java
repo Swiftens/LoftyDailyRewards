@@ -1,78 +1,98 @@
 package me.swiftens.loftyDailyRewards.managers;
 
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
+import me.swiftens.loftyDailyRewards.builders.MessageBuilder;
 import me.swiftens.loftyDailyRewards.enums.MessageKeys;
 import me.swiftens.loftyDailyRewards.utils.TextUtils;
 import me.swiftens.loftyDailyRewards.utils.YamlAccess;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MessageManager {
 
-    private final LoftyDailyRewards core;
+    private final BukkitAudiences audiences;
+
     private final YamlAccess messages;
-    private final Map<MessageKeys, String> messageCache;
     private String prefix;
 
-    public MessageManager(LoftyDailyRewards core) {
-        this.core = core;
+    public MessageManager(LoftyDailyRewards core, BukkitAudiences audiences) {
+        this.audiences = audiences;
         this.messages = new YamlAccess(core, "messages.yml");
         messages.saveDefaultConfig();
 
-        this.messageCache = new HashMap<>();
-        cacheMessage();
+        prefix = messages.getFile().getString("prefix");
     }
 
-    /*
-    * Send a message to a player
-    *
-    * @param sender the sender or player to send the message to
-    * @param key the messagekey that corresponds the message to
-    * @param time the time remaining for message.
-     */
-    public void sendMessage(CommandSender sender, MessageKeys key, String time) {
-        String message = prefix;
+    public void remindCanClaim(Player player) {
+        sendMessage(audiences.player(player), MessageKeys.REMINDER_CAN_CLAIM, player, 0, null);
+    }
 
-        // No need to send a message if the cache is empty for the given key
-        String cachedMessage = messageCache.get(key);
-        if (StringUtils.isEmpty(cachedMessage)) {
-            return;
+    public void remindCantClaim(Player player, String time) {
+        sendMessage(audiences.player(player), MessageKeys.REMINDER_CANT_CLAIM, player, 0, time);
+    }
+
+    public void notifyChange(Player player, int streak, boolean highest) {
+        Audience audience = audiences.player(player);
+        if (highest) {
+            sendMessage(audience, MessageKeys.COMMAND_HIGHEST_STREAK_SUCCESSFUL_NOTIFY, player, streak, null);
+        } else {
+            sendMessage(audience, MessageKeys.COMMAND_STREAK_SUCCESSFUL_NOTIFY, player, streak, null);
         }
+    }
 
-        message += cachedMessage;
-
-        if (time != null) {
-            message = message.replace("{time}", time);
+    public void messageChange(CommandSender sender, Player player, int streak, boolean highest) {
+        Audience audience = audiences.sender(sender);
+        if (highest) {
+            sendMessage(audience, MessageKeys.COMMAND_HIGHEST_STREAK_SUCCESSFUL, player, streak, null);
+        } else {
+            sendMessage(audience, MessageKeys.COMMAND_STREAK_SUCCESSFUL, player, streak, null);
         }
-
-        // Send the message to the sender
-        sender.sendMessage(message);
     }
 
-    public String getCanClaimPlaceholder() {
-        return TextUtils.translateHexCodes(messages.getFile().getString("placeholder.can-claim", "Finished"));
+    public void messageClaim(Player player, int streak, boolean broadcast) {
+        sendMessage(
+                audiences.player(player),
+                MessageKeys.COMMAND_CLAIM_MESSAGE,
+                player,
+                streak,
+                null
+        );
+
+        if (broadcast) {
+            sendMessage(
+                    audiences.all(),
+                    MessageKeys.CLAIM_BROADCAST,
+                    player,
+                    streak,
+                    null
+            );
+        }
     }
 
 
+    public void simpleMessage(CommandSender sender, MessageKeys key) {
+        sendMessage(audiences.sender(sender), key, null, 0, null);
+    }
 
     public void reload() {
         messages.reloadFile();
-        cacheMessage();
+
+        prefix = messages.getFile().getString("prefix");
     }
 
+    private void sendMessage(Audience audience, MessageKeys key, Player player, int streak, String time) {
+        String message = messages.getFile().getString(key.getKey());
+        if (StringUtils.isEmpty(message)) return;
+        MessageBuilder builder = new MessageBuilder(prefix, message);
 
-    private void cacheMessage() {
-        // Default Strings are always empty rather than null
-        prefix = TextUtils.translateHexCodes(messages.getFile().getString("prefix", ""));
-        for (MessageKeys keys: MessageKeys.values()) {
-            messageCache.put(keys, TextUtils.translateHexCodes(messages.getFile().getString(keys.getKey())));
-        }
+        if (player != null) builder = builder.player(player);
+        if (streak > 0) builder = builder.streak(streak);
+        if (time != null) builder = builder.time(time);
+
+        audience.sendMessage(builder.build());
     }
-
-
 
 }
