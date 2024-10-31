@@ -3,8 +3,6 @@ package me.swiftens.loftyDailyRewards.placeholders;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 import me.swiftens.loftyDailyRewards.managers.ConfigManager;
-import me.swiftens.loftyDailyRewards.managers.MessageManager;
-import me.swiftens.loftyDailyRewards.utils.TextUtils;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,11 +11,9 @@ import java.util.UUID;
 public class DailyRewardsPlaceholders extends PlaceholderExpansion {
 
     private final DataManager dataManager;
-    private final MessageManager messageManager;
     private final ConfigManager config;
 
-    public DailyRewardsPlaceholders(MessageManager messageManager, DataManager dataManager, ConfigManager configManager) {
-        this.messageManager = messageManager;
+    public DailyRewardsPlaceholders(DataManager dataManager, ConfigManager configManager) {
         this.dataManager = dataManager;
         this.config = configManager;
     }

@@ -1,21 +1,16 @@
 package me.swiftens.loftyDailyRewards.listeners;
 
-import me.swiftens.loftyDailyRewards.enums.MessageKeys;
 import me.swiftens.loftyDailyRewards.managers.ConfigManager;
 import me.swiftens.loftyDailyRewards.managers.MessageManager;
 import me.swiftens.loftyDailyRewards.managers.RewardsManager;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 import me.swiftens.loftyDailyRewards.managers.GuiManager;
-import me.swiftens.loftyDailyRewards.utils.TextUtils;
 
 import java.util.UUID;
 

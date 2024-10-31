@@ -1,6 +1,5 @@
 package me.swiftens.loftyDailyRewards.commands;
 
-import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.enums.MessageKeys;
 import me.swiftens.loftyDailyRewards.managers.ConfigManager;
 import me.swiftens.loftyDailyRewards.managers.MessageManager;
@@ -13,7 +12,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 import me.swiftens.loftyDailyRewards.managers.GuiManager;
-import me.swiftens.loftyDailyRewards.utils.TextUtils;
 
 import java.util.UUID;
 
@@ -101,6 +99,12 @@ public class DailyRewardsExecutor implements CommandExecutor {
 
                 try {
                     int amount = Integer.parseInt(args[3]);
+
+                    if (amount < 0) {
+                        messageManager.simpleMessage(sender, MessageKeys.COMMAND_INVALID_AMOUNT);
+                        return;
+                    }
+
                     if (args[1].equalsIgnoreCase("streak")) {
                         dataManager.setCurrentStreak(playerId, amount);
                         messageManager.messageChange(sender, player, amount, false);

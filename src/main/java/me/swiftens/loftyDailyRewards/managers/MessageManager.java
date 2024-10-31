@@ -3,7 +3,6 @@ package me.swiftens.loftyDailyRewards.managers;
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.builders.MessageBuilder;
 import me.swiftens.loftyDailyRewards.enums.MessageKeys;
-import me.swiftens.loftyDailyRewards.utils.TextUtils;
 import me.swiftens.loftyDailyRewards.utils.YamlAccess;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
