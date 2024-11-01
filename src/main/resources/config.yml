@@ -75,3 +75,8 @@ gui:
     previous_page:
       name: "&6Previous Page"
       item: "ARROW"
+
+
+# This is to check if the plugin has been updated but the file hasn't
+# Please do not modify this!
+file-version: 1

@@ -300,3 +300,8 @@ days:
       - '&7- &a$2,000'
     rewards:
       - 'eco give {player} 2000'
+
+
+# This is to check if the plugin has been updated but the file hasn't
+# Please do not modify this!
+file-version: 1

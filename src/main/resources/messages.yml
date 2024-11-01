@@ -33,3 +33,7 @@ commands:
 # %dailyrewards_current_streak% - The player's current streak in integer
 # %dailyrewards_highest_streak% - The player's highest streak in integer
 # %dailyrewards_time_remaining% - The time remaining or "can-claim" if they can claim.
+
+# This is to check if the plugin has been updated but the file hasn't
+# Please do not modify this!
+file-version: 1
