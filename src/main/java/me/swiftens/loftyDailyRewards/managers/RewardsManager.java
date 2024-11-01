@@ -37,9 +37,8 @@ public class RewardsManager {
     }
 
     public int getDay(int streak) {
-        int day = streak + 1 % totalDays;
+        int day = (streak + 1) % totalDays;
         if (day == 0) day = totalDays;
-
         return day;
     }
 

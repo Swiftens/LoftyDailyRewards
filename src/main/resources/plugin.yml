@@ -1,5 +1,5 @@
 name: LoftyDailyRewards
-version: '1.0'
+version: $version
 main: me.swiftens.loftyDailyRewards.LoftyDailyRewards
 api-version: '1.18'
 description: Daily Rewards System for Lofty
