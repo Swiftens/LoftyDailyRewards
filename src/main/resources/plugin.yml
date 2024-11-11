@@ -5,6 +5,7 @@ api-version: '1.18'
 description: Daily Rewards System for Lofty
 softdepend:
   - PlaceholderAPI
+  - Vault
 
 commands:
   dailyrewards:
@@ -20,7 +21,7 @@ permissions:
       dailyrewards.set: true
       dailyrewards.skip: true
   dailyrewards.open:
-    description: Open the DailyRewards menu. If the player can does not have this permission, they will not be reminded that they can claim
+    description: Open the DailyRewards menu. If the player does not have this permission, they will not be reminded that they can claim
     default: true
   dailyrewards.reload:
     description: Access to reloading of config files.

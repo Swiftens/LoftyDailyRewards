@@ -2,24 +2,35 @@ package me.swiftens.loftyDailyRewards.managers;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
+import me.swiftens.loftyDailyRewards.builders.MessageBuilder;
 import me.swiftens.loftyDailyRewards.utils.TextUtils;
 import me.swiftens.loftyDailyRewards.utils.YamlAccess;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.sound.Sound;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Map;
 
 public class RewardsManager {
 
     private final YamlAccess rewards;
     private final ConfigManager config;
+    private final Economy economy;
+    private final BukkitAudiences audiences;
 
     private int totalDays;
     private int lastPage;
 
-    public RewardsManager(LoftyDailyRewards core, ConfigManager config) {
+    public RewardsManager(LoftyDailyRewards core, ConfigManager config, Economy economy, BukkitAudiences audiences) {
         this.config = config;
+        this.economy = economy;
         this.rewards = new YamlAccess(core, "rewards.yml");
+        this.audiences = audiences;
         rewards.saveDefaultConfig();
 
         totalDays = rewards.getFile().getConfigurationSection("days").getKeys(false).size();

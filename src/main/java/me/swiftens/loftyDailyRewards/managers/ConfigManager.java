@@ -87,6 +87,16 @@ public class ConfigManager {
     }
 
     private void init() {
+        core.getConfig().options().copyDefaults(true);
+        saveAndReload();
+        int version = getInt("file-version");
+        if (version < 2) {
+            core.getConfig().setComments("update-remind", List.of("Whether to be reminded when an update is uploaded"));
+            version++;
+        }
+        core.getConfig().set("file-version", version);
+        core.saveConfig();
+
         dailySlots = core.getConfig().getIntegerList("gui.slots.daily");
 
         itemStacks.clear();
@@ -119,6 +129,11 @@ public class ConfigManager {
 
     private String colorize(String text) {
         return TextUtils.translateHexCodes(text);
+    }
+
+    private void saveAndReload() {
+        core.saveConfig();
+        core.reloadConfig();
     }
 
 }

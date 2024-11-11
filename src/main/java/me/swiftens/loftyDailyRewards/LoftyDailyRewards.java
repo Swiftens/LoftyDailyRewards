@@ -1,5 +1,7 @@
 package me.swiftens.loftyDailyRewards;
 
+import com.jeff_media.updatechecker.UpdateCheckSource;
+import com.jeff_media.updatechecker.UpdateChecker;
 import me.swiftens.loftyDailyRewards.commands.DailyRewardsTabCompleter;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 import me.swiftens.loftyDailyRewards.managers.MessageManager;
@@ -18,6 +20,8 @@ import java.sql.SQLException;
 
 public final class LoftyDailyRewards extends JavaPlugin {
 
+    private static final String SPIGOT_RESOURCE_ID = "120542";
+    private UpdateChecker updateChecker;
     BukkitTask reminder;
 
     @Override
@@ -31,6 +35,15 @@ public final class LoftyDailyRewards extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new DailyRewardsPlaceholders(Bootstrapper.getInstance().getDataManager(),
                     Bootstrapper.getInstance().getConfigManager()).register();
+        }
+
+        if (getConfig().getBoolean("update-remind")) {
+            updateChecker = new UpdateChecker(this, UpdateCheckSource.SPIGET, SPIGOT_RESOURCE_ID)
+                    .setNotifyOpsOnJoin(true)
+                    .setDonationLink("https://paypal.me/swiftens")
+                    .setDownloadLink("https://www.spigotmc.org/resources/loftydailyrewards.120542/")
+                    .checkEveryXHours(1)
+                    .checkNow(Bukkit.getConsoleSender());
         }
     }
 
@@ -47,6 +60,8 @@ public final class LoftyDailyRewards extends JavaPlugin {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        updateChecker.stop();
     }
 
     private void registerCommands() {

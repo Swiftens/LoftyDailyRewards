@@ -1,3 +1,6 @@
+# Whether to be reminded when an update is uploaded
+update-remind: true
+
 # How often to remind players that they can claim their daily rewards.
 # Set to -1 to disable, in minutes.
 reminder-interval: 10
@@ -76,7 +79,6 @@ gui:
       name: "&6Previous Page"
       item: "ARROW"
 
-
 # This is to check if the plugin has been updated but the file hasn't
 # Please do not modify this!
-file-version: 1
+file-version: 2
