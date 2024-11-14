@@ -38,6 +38,10 @@ public class ConfigManager {
         return dailySlots.size();
     }
 
+    public String getDatabaseString(String path) {
+        return core.getConfig().getString("database." + path);
+    }
+
     public String getWaitingTime(long millis) {
         if (millis < 1) {
             return TextUtils.translateHexCodes(core.getConfig().getString("time-remaining.can-claim"));
@@ -92,6 +96,11 @@ public class ConfigManager {
         int version = getInt("file-version");
         if (version < 2) {
             core.getConfig().setComments("update-remind", List.of("Whether to be reminded when an update is uploaded"));
+            version++;
+        }
+        if (version < 3) {
+            core.getConfig().setComments("database.type", List.of("\"sqlite\" or \"sql\""));
+            core.getConfig().setComments("database.table_prefix", List.of("These values are only needed to be set up if the database type is sql"));
             version++;
         }
         core.getConfig().set("file-version", version);

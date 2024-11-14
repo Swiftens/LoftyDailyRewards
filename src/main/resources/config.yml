@@ -1,3 +1,14 @@
+database:
+  # "sqlite" or "sql"
+  type: "sqlite"
+  # These values are only needed to be set up if the database type is sql
+  mysql:
+    host: "127.0.0.1"
+    port: 3306
+    database: database
+    username: root
+    password: ''
+
 # Whether to be reminded when an update is uploaded
 update-remind: true
 

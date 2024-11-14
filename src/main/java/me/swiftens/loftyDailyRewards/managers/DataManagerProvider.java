@@ -15,20 +15,33 @@ public class DataManagerProvider implements DataManager {
     private static final String TABLE_NAME = "loftydaily_data";
 
     private final LoftyDailyRewards core;
+    private final ConfigManager config;
     private Connection connection;
 
     // Cache getLastClaim because it can be called quite a lot.
     private final Map<UUID, Long> lastClaimCache;
 
 
-    public DataManagerProvider(LoftyDailyRewards core) {
+    public DataManagerProvider(LoftyDailyRewards core, ConfigManager configManager) {
         this.core = core;
         this.lastClaimCache = new HashMap<>();
-        File file = new File(core.getDataFolder(), "data.db");
-        createFile(file);
+        this.config = configManager;
+        String databaseType = config.getDatabaseString("type").toLowerCase(),
+                url = String.format("jdbc:mysql://%s:%s/%s", config.getDatabaseString("mysql.host"),
+                        config.getDatabaseString("mysql.port"), config.getDatabaseString("mysql.database")),
+                username = config.getDatabaseString("mysql.username"),
+                password = config.getDatabaseString("mysql.password");
 
         try {
-            this.connection = DriverManager.getConnection("jdbc:sqlite:" + file);
+            if (databaseType.equalsIgnoreCase("sql")) {
+                this.connection = DriverManager.getConnection(
+                    url, username, password
+                );
+            } else {
+                File file = new File(core.getDataFolder(), "data.db");
+                createFile(file);
+                this.connection = DriverManager.getConnection("jdbc:sqlite:" + file);
+            }
             createTable();
         } catch (SQLException e) {
             core.getLogger().severe("Could not make a connection to the database!");
@@ -39,7 +52,12 @@ public class DataManagerProvider implements DataManager {
 
     @Override
     public void setDefaultData(UUID playerId) {
-        String query = "INSERT OR IGNORE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
+        String query;
+        if (config.getDatabaseString("type").equalsIgnoreCase("sql")) {
+            query = "INSERT IGNORE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
+        } else {
+            query = "INSERT OR IGNORE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
+        }
         try (PreparedStatement statement = connection.prepareStatement(query)){
             statement.setString(1, playerId.toString());
             statement.setInt(2, 0);
@@ -129,7 +147,7 @@ public class DataManagerProvider implements DataManager {
 
 
     private void createTable() {
-        String query = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(playerId text primary key, streak integer, highest_streak integer, last_claim integer)";
+        String query = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(playerId varchar(36) primary key, streak integer, highest_streak integer, last_claim bigint)";
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(query);
         } catch (SQLException e) {

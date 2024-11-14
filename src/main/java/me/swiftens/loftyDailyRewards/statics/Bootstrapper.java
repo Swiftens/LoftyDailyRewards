@@ -4,9 +4,6 @@ import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 import me.swiftens.loftyDailyRewards.managers.*;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class Bootstrapper {
 
@@ -26,22 +23,17 @@ public class Bootstrapper {
     private DataManager dataManager;
     private GuiManager guiManager;
 
-    private Economy econ;
 
     public void initialize(LoftyDailyRewards core) {
         BukkitAudiences audiences = BukkitAudiences.create(core);
-        setupEconomy();
 
         this.configManager = new ConfigManager(core);
         this.messageManager = new MessageManager(core, audiences);
-        this.rewardsManager = new RewardsManager(core, configManager, econ, audiences);
+        this.rewardsManager = new RewardsManager(core, configManager, audiences);
         this.guiManager = new GuiManager(configManager, rewardsManager);
-        this.dataManager = new DataManagerProvider(core);
+        this.dataManager = new DataManagerProvider(core, configManager);
     }
 
-    public Economy getEconomy() {
-        return this.econ;
-    }
 
     public ConfigManager getConfigManager() {
         return configManager;
@@ -63,14 +55,4 @@ public class Bootstrapper {
         return guiManager;
     }
 
-    private void setupEconomy() {
-        if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
-            return;
-        }
-        RegisteredServiceProvider<Economy> rsp = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return;
-        }
-        econ = rsp.getProvider();
-    }
 }

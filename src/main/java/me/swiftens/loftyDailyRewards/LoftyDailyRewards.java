@@ -42,7 +42,7 @@ public final class LoftyDailyRewards extends JavaPlugin {
                     .setNotifyOpsOnJoin(true)
                     .setDonationLink("https://paypal.me/swiftens")
                     .setDownloadLink("https://www.spigotmc.org/resources/loftydailyrewards.120542/")
-                    .checkEveryXHours(1)
+                    .checkEveryXHours(6)
                     .checkNow(Bukkit.getConsoleSender());
         }
     }
