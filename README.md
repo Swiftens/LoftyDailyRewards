@@ -6,7 +6,6 @@ Main Plugin Version: 1.18.2
 ## Planned Features
 * **Leaderboard (up to top 10)**
 * **Playtime Requirements**
-* **SQL and Database Transfer**
 * **Multiple Day Modes**
 * **Hook onto other plugins for rewards**  
 &nbsp;- Vault
