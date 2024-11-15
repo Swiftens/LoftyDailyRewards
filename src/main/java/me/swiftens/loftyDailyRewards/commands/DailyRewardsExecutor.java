@@ -73,7 +73,11 @@ public class DailyRewardsExecutor implements CommandExecutor {
             messageManager.simpleMessage(sender, MessageKeys.COMMAND_CONFIG_RELOADED);
         } else if (argument.equalsIgnoreCase("open")) {
             handleNoArgs(sender);
-        }else {
+        } else if (argument.equalsIgnoreCase("migrate")) {
+            if (hasNoPermission(sender, "dailyrewards.migrate")) return;
+            dataManager.migrate(null);
+            messageManager.simpleMessage(sender, MessageKeys.COMMAND_MIGRATE_SUCCESSFUL);
+        } else {
             manageHelpMessage(sender);
         }
     }
@@ -118,6 +122,14 @@ public class DailyRewardsExecutor implements CommandExecutor {
                     messageManager.simpleMessage(sender, MessageKeys.COMMAND_INVALID_AMOUNT);
                 }
 
+            }
+            case "migrate" -> {
+                if (hasNoPermission(sender, "dailyrewards.migrate")) return;
+                player = getPlayer(sender, args[1]);
+                if (player == null) return;
+                playerId = player.getUniqueId();
+                dataManager.migrate(playerId);
+                messageManager.simpleMessage(sender, MessageKeys.COMMAND_MIGRATE_SUCCESSFUL);
             }
             default -> manageHelpMessage(sender);
         }

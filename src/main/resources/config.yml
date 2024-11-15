@@ -1,5 +1,6 @@
+# Changing this requires a restart
 database:
-  # "sqlite" or "sql"
+  # "sqlite" or "mysql"
   type: "sqlite"
   # These values are only needed to be set up if the database type is sql
   mysql:
@@ -92,4 +93,4 @@ gui:
 
 # This is to check if the plugin has been updated but the file hasn't
 # Please do not modify this!
-file-version: 2
+file-version: 3

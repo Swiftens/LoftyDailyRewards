@@ -99,7 +99,8 @@ public class ConfigManager {
             version++;
         }
         if (version < 3) {
-            core.getConfig().setComments("database.type", List.of("\"sqlite\" or \"sql\""));
+            core.getConfig().setComments("database", List.of("Changing this requires a restart"));
+            core.getConfig().setComments("database.type", List.of("\"sqlite\" or \"mysql\""));
             core.getConfig().setComments("database.table_prefix", List.of("These values are only needed to be set up if the database type is sql"));
             version++;
         }

@@ -2,6 +2,7 @@ package me.swiftens.loftyDailyRewards.managers;
 
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class DataManagerProvider implements DataManager {
                 password = config.getDatabaseString("mysql.password");
 
         try {
-            if (databaseType.equalsIgnoreCase("sql")) {
+            if (databaseType.equalsIgnoreCase("mysql")) {
                 this.connection = DriverManager.getConnection(
                     url, username, password
                 );
@@ -53,7 +54,7 @@ public class DataManagerProvider implements DataManager {
     @Override
     public void setDefaultData(UUID playerId) {
         String query;
-        if (config.getDatabaseString("type").equalsIgnoreCase("sql")) {
+        if (config.getDatabaseString("type").equalsIgnoreCase("mysql")) {
             query = "INSERT IGNORE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
         } else {
             query = "INSERT OR IGNORE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
@@ -137,6 +138,54 @@ public class DataManagerProvider implements DataManager {
 
         // If the difference is over 1 day, then they can claim.
         return difference >= 86400000;
+    }
+
+    @Override
+    public void migrate(UUID playerId) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Connection otherDatabase;
+                PreparedStatement fetchStatement, queryStatement;
+                String  url = String.format("jdbc:mysql://%s:%s/%s", config.getDatabaseString("mysql.host"),
+                        config.getDatabaseString("mysql.port"), config.getDatabaseString("mysql.database")),
+                        username = config.getDatabaseString("mysql.username"),
+                        password = config.getDatabaseString("mysql.password");
+
+                String fetch = playerId != null ? "SELECT * FROM " + TABLE_NAME + " WHERE playerId = ?" : "SELECT * FROM " + TABLE_NAME;
+                String query;
+                try {
+                    if (config.getDatabaseString("type").equalsIgnoreCase("mysql")) {
+                        File file = new File(core.getDataFolder(), "data.db");
+                        otherDatabase = DriverManager.getConnection("jdbc:sqlite:" + file);
+                        query = playerId != null ? "REPLACE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)"
+                                : "INSERT IGNORE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
+                    } else {
+                        otherDatabase = DriverManager.getConnection(url, username, password);
+                        query = playerId != null ? "INSERT OR REPLACE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)"
+                                : "INSERT OR IGNORE INTO " + TABLE_NAME + " (playerId, streak, highest_streak, last_claim) values (?,?,?,?)";
+                    }
+                    fetchStatement = otherDatabase.prepareStatement(fetch);
+                    if (playerId != null) fetchStatement.setString(1, playerId.toString());
+                    ResultSet fetchResult = fetchStatement.executeQuery();
+                    queryStatement = connection.prepareStatement(query);
+
+                    while (fetchResult.next()) {
+                        queryStatement.setString(1, fetchResult.getString("playerId"));
+                        queryStatement.setLong(2, fetchResult.getInt("streak"));
+                        queryStatement.setLong(3, fetchResult.getInt("highest_streak"));
+                        queryStatement.setLong(4, fetchResult.getLong("last_claim"));
+
+                        queryStatement.executeUpdate();
+                    }
+
+                    otherDatabase.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.runTaskAsynchronously(core);
+
     }
 
 

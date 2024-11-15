@@ -6,6 +6,7 @@ public enum MessageKeys {
     REMINDER_CAN_CLAIM("can-claim"),
     CLAIM_BROADCAST("claim-broadcast"),
     COMMAND_CLAIM_MESSAGE("claim-message"),
+    COMMAND_MIGRATE_SUCCESSFUL("commands.migrate-successful"),
     COMMAND_SKIP_SUCCESSFUL("commands.skip-successful"),
     COMMAND_STREAK_SUCCESSFUL("commands.streak-set-successful.message"),
     COMMAND_STREAK_SUCCESSFUL_NOTIFY("commands.streak-set-successful.notify"),

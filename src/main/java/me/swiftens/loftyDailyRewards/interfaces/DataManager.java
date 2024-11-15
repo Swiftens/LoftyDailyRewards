@@ -94,6 +94,16 @@ public interface DataManager {
     boolean canClaim(UUID playerId);
 
     /*
+    * Migrate data from sqlite to sql and vice versa.
+    * If the playerId is null, server-wide migrate is done without overrides
+    * If playerId is specified, player migrate is done with override.
+    *
+    *
+    * @param playerId the player's uuid. nullable
+     */
+    void migrate(UUID playerId);
+
+    /*
     * Close the connection
      */
     void close() throws SQLException;

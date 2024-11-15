@@ -21,6 +21,9 @@ public class MessageManager {
         this.audiences = audiences;
         this.messages = new YamlAccess(core, "messages.yml");
         messages.saveDefaultConfig();
+        messages.getFile().options().copyDefaults(true);
+        messages.getFile();
+        reload();
 
         prefix = messages.getFile().getString("prefix");
     }
@@ -93,5 +96,6 @@ public class MessageManager {
 
         audience.sendMessage(builder.build());
     }
+
 
 }

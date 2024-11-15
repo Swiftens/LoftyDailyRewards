@@ -31,3 +31,6 @@ permissions:
   dailyrewards.skip:
     description: Allow players to skip waiting time
     default: op
+  dailyrewards.migrate:
+    description: Migrate from sqlite to sql or vice versa
+    default: op

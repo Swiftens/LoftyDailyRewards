@@ -18,6 +18,7 @@ can-claim: "&aYou can claim your daily reward!"
 
 commands:
   config-reloaded: "&eConfig files reloaded!"
+  migrate-successful: "&eSuccessfully migrated database."
   skip-successful: "&eSkipped waiting time for player."
   streak-set-successful:
     message: "&eChanged player's current streak to {streak}."
