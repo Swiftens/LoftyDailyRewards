@@ -21,10 +21,16 @@ reminder-interval: 10
 # Set to 1 for every day, set to 0 for never.
 broadcast-difference: 10
 
+# In minuts, requires playtime before the player can claim
+playtime-requirements: 10
+
 time-remaining:
   can-claim: "Finished"
 # %h - The number of hours remaining, %m - The number of minutes remaining, %s - The number of seconds remaining
   waiting: "%hh %mm %ss"
+
+# Whether to close the gui on claim or keep it open
+auto-close: true
 
 gui:
 
@@ -93,4 +99,4 @@ gui:
 
 # This is to check if the plugin has been updated but the file hasn't
 # Please do not modify this!
-file-version: 3
+file-version: 4

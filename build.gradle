@@ -1,12 +1,12 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id 'java'
-    id "io.github.goooler.shadow" version "8.1.8"
+    id 'com.gradleup.shadow' version '8.3.5'
 }
 
 group = 'me.swiftens'
-version = '1.1.0'
+version = '1.2.0'
 
 repositories {
     mavenCentral()

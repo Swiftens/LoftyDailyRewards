@@ -2,12 +2,14 @@ package me.swiftens.loftyDailyRewards.managers;
 
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -186,6 +188,30 @@ public class DataManagerProvider implements DataManager {
             }
         }.runTaskAsynchronously(core);
 
+    }
+
+    @Override
+    public Map<String, Integer> getTopTen() {
+        Map<String, Integer> top = new LinkedHashMap<>();
+
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY highest_streak DESC";
+        try (Statement statement = connection.createStatement()) {
+            ResultSet set = statement.executeQuery(query);
+            int i = 0;
+            while (set.next() && i < 10) {
+                top.put(
+                        Bukkit.getPlayer(UUID.fromString(set.getString("playerId"))).getName(),
+                        set.getInt("highest_streak")
+                );
+                i++;
+            }
+
+        } catch (SQLException e) {
+            core.getLogger().severe("Could not retrieve top ten for LoftyDailyRewards!");
+            core.getLogger().severe(e.getMessage());
+        }
+
+        return top;
     }
 
 

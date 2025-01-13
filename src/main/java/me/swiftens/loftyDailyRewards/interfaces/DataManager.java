@@ -1,6 +1,7 @@
 package me.swiftens.loftyDailyRewards.interfaces;
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.UUID;
 
 public interface DataManager {
@@ -102,6 +103,12 @@ public interface DataManager {
     * @param playerId the player's uuid. nullable
      */
     void migrate(UUID playerId);
+
+    /**
+     *
+     * @return a linkedhashmap for the top 10 highest streaks
+     */
+    Map<String, Integer> getTopTen();
 
     /*
     * Close the connection

@@ -5,6 +5,8 @@ public enum MessageKeys {
     REMINDER_CANT_CLAIM("login-cant-claim"),
     REMINDER_CAN_CLAIM("can-claim"),
     CLAIM_BROADCAST("claim-broadcast"),
+    LEADERBOARD_HEADER("leaderboard.header"),
+    LEADERBOARD_ITEM("leaderboard.item"),
     COMMAND_CLAIM_MESSAGE("claim-message"),
     COMMAND_MIGRATE_SUCCESSFUL("commands.migrate-successful"),
     COMMAND_SKIP_SUCCESSFUL("commands.skip-successful"),

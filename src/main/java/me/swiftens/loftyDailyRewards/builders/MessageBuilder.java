@@ -18,7 +18,7 @@ public class MessageBuilder {
 
 
     public MessageBuilder replace(String placeholder, String value) {
-        this.message = this.message.replaceAll(placeholder, value);
+        this.message = this.message.replace(placeholder, value);
         return this;
     }
 

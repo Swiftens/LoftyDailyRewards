@@ -16,6 +16,10 @@ login-cant-claim: "&aYou can claim your rewards in &c{time}&a!"
 # If the player can claim, they are also reminded every "reminder-interval" in minutes that they can claim.
 can-claim: "&aYou can claim your daily reward!"
 
+leaderboard:
+  header: "&f&m-----&r[ &eDaily Rewards Leaderboard &f]&m-----"
+  item: "&f{rank}. {player}: {streak} days"
+
 commands:
   config-reloaded: "&eConfig files reloaded!"
   migrate-successful: "&eSuccessfully migrated database."
@@ -37,4 +41,4 @@ commands:
 
 # This is to check if the plugin has been updated but the file hasn't
 # Please do not modify this!
-file-version: 1
+file-version: 2

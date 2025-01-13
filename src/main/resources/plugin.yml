@@ -34,3 +34,6 @@ permissions:
   dailyrewards.migrate:
     description: Migrate from sqlite to sql or vice versa
     default: op
+  dailyrewards.leaderboard:
+    description: Access to the leaderboard
+    default: op

@@ -50,16 +50,12 @@ public class ConfigManager {
         String format = TextUtils.translateHexCodes(core.getConfig().getString("time-remaining.waiting"));
 
         long seconds = millis / 1000L;
-        long minutes = 0L;
-        while (seconds > 60L) {
-            seconds -=60L;
-            minutes++;
-        }
-        long hours = 0L;
-        while (minutes > 60L) {
-            minutes -=60L;
-            hours++;
-        }
+        long minutes = seconds / 60L;
+        seconds %= 60L;
+        long hours = minutes / 60L;
+        minutes %= 60L;
+        hours %= 24L;
+
         return format.replace("%h", String.valueOf(hours))
                 .replace("%m", String.valueOf(minutes))
                 .replace("%s", String.valueOf(seconds));
@@ -90,6 +86,10 @@ public class ConfigManager {
         return item;
     }
 
+    public boolean isAutoClose() {
+        return core.getConfig().getBoolean("auto-close");
+    }
+
     private void init() {
         core.getConfig().options().copyDefaults(true);
         saveAndReload();
@@ -102,6 +102,10 @@ public class ConfigManager {
             core.getConfig().setComments("database", List.of("Changing this requires a restart"));
             core.getConfig().setComments("database.type", List.of("\"sqlite\" or \"mysql\""));
             core.getConfig().setComments("database.table_prefix", List.of("These values are only needed to be set up if the database type is sql"));
+            version++;
+        }
+        if (version < 4) {
+            core.getConfig().setComments("auto-close", List.of("Whether to close the gui on claim or keep it open"));
             version++;
         }
         core.getConfig().set("file-version", version);
@@ -131,6 +135,7 @@ public class ConfigManager {
         }
 
     }
+
 
     public void reload() {
         core.reloadConfig();

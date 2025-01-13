@@ -10,6 +10,8 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
+
 public class MessageManager {
 
     private final BukkitAudiences audiences;
@@ -22,10 +24,8 @@ public class MessageManager {
         this.messages = new YamlAccess(core, "messages.yml");
         messages.saveDefaultConfig();
         messages.getFile().options().copyDefaults(true);
-        messages.getFile();
+        messages.saveFile();
         reload();
-
-        prefix = messages.getFile().getString("prefix");
     }
 
     public void remindCanClaim(Player player) {
@@ -52,6 +52,24 @@ public class MessageManager {
         } else {
             sendMessage(audience, MessageKeys.COMMAND_STREAK_SUCCESSFUL, player, streak, null);
         }
+    }
+
+    // Make sure that you are using a LinkedHashMap
+    public void sendLeaderboard(CommandSender sender, Map<String, Integer> leaderboard) {
+        Audience audience = audiences.sender(sender);
+        String preFormatted = messages.getFile().getString(MessageKeys.LEADERBOARD_ITEM.getKey()), formatted;
+        audience.sendMessage(new MessageBuilder("", messages.getFile().getString(MessageKeys.LEADERBOARD_HEADER.getKey())).build());
+        int i = 1;
+        for (Map.Entry<String, Integer> entry: leaderboard.entrySet()) {
+            MessageBuilder builder = new MessageBuilder("", preFormatted);
+
+            builder.replace("{rank}", String.valueOf(i));
+            builder.replace("{player}", entry.getKey());
+            builder.streak(entry.getValue());
+
+            audience.sendMessage(builder.build());
+        }
+
     }
 
     public void messageClaim(Player player, int streak, boolean broadcast) {

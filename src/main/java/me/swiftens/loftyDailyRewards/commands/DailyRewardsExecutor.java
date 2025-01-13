@@ -13,6 +13,8 @@ import org.bukkit.entity.Player;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 import me.swiftens.loftyDailyRewards.managers.GuiManager;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class DailyRewardsExecutor implements CommandExecutor {
@@ -77,6 +79,9 @@ public class DailyRewardsExecutor implements CommandExecutor {
             if (hasNoPermission(sender, "dailyrewards.migrate")) return;
             dataManager.migrate(null);
             messageManager.simpleMessage(sender, MessageKeys.COMMAND_MIGRATE_SUCCESSFUL);
+        } else if (argument.equalsIgnoreCase("leaderboard")) {
+            if (hasNoPermission(sender, "dailyrewards.leaderboard")) return;
+            messageManager.sendLeaderboard(sender, dataManager.getTopTen());
         } else {
             manageHelpMessage(sender);
         }

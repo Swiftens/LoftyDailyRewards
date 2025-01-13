@@ -80,8 +80,13 @@ public class DailyRewardsListener implements Listener {
             broadcast = broadcastDifference > 0 && newStreak % broadcastDifference == 0;
             messageManager.messageClaim(player, newStreak, broadcast);
 
-            newDay = rewardsManager.getDay(day);
-            openGui(player, playerId, guiManager.getPageFromDay(newDay), newDay);
+            if (config.isAutoClose()) {
+                player.closeInventory();
+                guiManager.removePlayerFromGui(playerId);
+            } else {
+                newDay = rewardsManager.getDay(day);
+                openGui(player, playerId, guiManager.getPageFromDay(newDay), newDay);
+            }
         }
 
     }
