@@ -37,9 +37,9 @@ public class DailyRewardsListener implements Listener {
 
         if (player.hasPermission("dailyrewards.open")) {
             if (dataManager.canClaim(player.getUniqueId())) {
-                messageManager.remindCanClaim(player);
+                messageManager.remindClaim(player, null);
             } else {
-                messageManager.remindCantClaim(player, config.getWaitingTime(dataManager.getTimeRemaining(player.getUniqueId())));
+                messageManager.remindClaim(player, config.getWaitingTime(dataManager.getTimeRemaining(player.getUniqueId())));
             }
         }
 

@@ -36,4 +36,4 @@ permissions:
     default: op
   dailyrewards.leaderboard:
     description: Access to the leaderboard
-    default: op
+    default: true

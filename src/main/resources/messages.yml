@@ -8,7 +8,6 @@ prefix: "&7[&#c9e9f6&lDaily Rewards&r&7] "
 claim-broadcast: "&e{player} has logged on for {streak} days straight!"
 claim-message: "&eYou claimed your {streak} day rewards!"
 
-
 # These are the reminders sent to the player upon logging in.
 # {time} - The time remaining
 login-cant-claim: "&aYou can claim your rewards in &c{time}&a!"

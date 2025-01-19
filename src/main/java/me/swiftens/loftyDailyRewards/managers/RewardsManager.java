@@ -1,10 +1,10 @@
 package me.swiftens.loftyDailyRewards.managers;
 
+import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.utils.TextUtils;
 import me.swiftens.loftyDailyRewards.utils.YamlAccess;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -14,15 +14,14 @@ public class RewardsManager {
 
     private final YamlAccess rewards;
     private final ConfigManager config;
-    private final BukkitAudiences audiences;
 
     private int totalDays;
+    @Getter
     private int lastPage;
 
-    public RewardsManager(LoftyDailyRewards core, ConfigManager config, BukkitAudiences audiences) {
+    public RewardsManager(LoftyDailyRewards core, ConfigManager config) {
         this.config = config;
         this.rewards = new YamlAccess(core, "rewards.yml");
-        this.audiences = audiences;
         rewards.saveDefaultConfig();
 
         totalDays = rewards.getFile().getConfigurationSection("days").getKeys(false).size();
@@ -43,10 +42,6 @@ public class RewardsManager {
         int day = (streak + 1) % totalDays;
         if (day == 0) day = totalDays;
         return day;
-    }
-
-    public int getLastPage() {
-        return lastPage;
     }
 
     public void reload() {

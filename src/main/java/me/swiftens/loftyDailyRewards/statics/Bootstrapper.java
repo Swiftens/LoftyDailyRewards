@@ -3,7 +3,6 @@ package me.swiftens.loftyDailyRewards.statics;
 import me.swiftens.loftyDailyRewards.LoftyDailyRewards;
 import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 import me.swiftens.loftyDailyRewards.managers.*;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 
 public class Bootstrapper {
 
@@ -18,18 +17,15 @@ public class Bootstrapper {
 
     private ConfigManager configManager;
     private RewardsManager rewardsManager;
-    private MessageManager messageManager;
 
     private DataManager dataManager;
     private GuiManager guiManager;
 
 
     public void initialize(LoftyDailyRewards core) {
-        BukkitAudiences audiences = BukkitAudiences.create(core);
 
         this.configManager = new ConfigManager(core);
-        this.messageManager = new MessageManager(core, audiences);
-        this.rewardsManager = new RewardsManager(core, configManager, audiences);
+        this.rewardsManager = new RewardsManager(core, configManager);
         this.guiManager = new GuiManager(configManager, rewardsManager);
         this.dataManager = new DataManagerProvider(core, configManager);
     }
@@ -41,10 +37,6 @@ public class Bootstrapper {
 
     public RewardsManager getRewardsManager() {
         return rewardsManager;
-    }
-
-    public MessageManager getMessageManager() {
-        return messageManager;
     }
 
     public DataManager getDataManager() {

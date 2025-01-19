@@ -1,7 +1,8 @@
 package me.swiftens.loftyDailyRewards.commands;
 
-import me.swiftens.loftyDailyRewards.enums.MessageKeys;
+import me.swiftens.loftyDailyRewards.interfaces.DataManager;
 import me.swiftens.loftyDailyRewards.managers.ConfigManager;
+import me.swiftens.loftyDailyRewards.managers.GuiManager;
 import me.swiftens.loftyDailyRewards.managers.MessageManager;
 import me.swiftens.loftyDailyRewards.managers.RewardsManager;
 import net.md_5.bungee.api.ChatColor;
@@ -10,11 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import me.swiftens.loftyDailyRewards.interfaces.DataManager;
-import me.swiftens.loftyDailyRewards.managers.GuiManager;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class DailyRewardsExecutor implements CommandExecutor {
@@ -62,7 +59,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
             guiManager.openGui(player, guiManager.getPageFromDay(day), day, dataManager.canClaim(playerId),
                     config.getWaitingTime(dataManager.getTimeRemaining(playerId)));
         } else {
-            messageManager.simpleMessage(sender, MessageKeys.COMMAND_PLAYER_ONLY);
+            messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_PLAYER_ONLY);
         }
     }
 
@@ -72,13 +69,13 @@ public class DailyRewardsExecutor implements CommandExecutor {
             config.reload();
             rewardsManager.reload();
             messageManager.reload();
-            messageManager.simpleMessage(sender, MessageKeys.COMMAND_CONFIG_RELOADED);
+            messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_CONFIG_RELOADED);
         } else if (argument.equalsIgnoreCase("open")) {
             handleNoArgs(sender);
         } else if (argument.equalsIgnoreCase("migrate")) {
             if (hasNoPermission(sender, "dailyrewards.migrate")) return;
             dataManager.migrate(null);
-            messageManager.simpleMessage(sender, MessageKeys.COMMAND_MIGRATE_SUCCESSFUL);
+            messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_MIGRATE_SUCESSFUL);
         } else if (argument.equalsIgnoreCase("leaderboard")) {
             if (hasNoPermission(sender, "dailyrewards.leaderboard")) return;
             messageManager.sendLeaderboard(sender, dataManager.getTopTen());
@@ -97,8 +94,8 @@ public class DailyRewardsExecutor implements CommandExecutor {
                 if (player == null) return;
                 playerId = player.getUniqueId();
                 dataManager.setLastClaim(playerId, System.currentTimeMillis() - 86400000);
-                messageManager.simpleMessage(sender, MessageKeys.COMMAND_SKIP_SUCCESSFUL);
-                messageManager.remindCanClaim(player);
+                messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_SKIP_SUCCESSFUL);
+                messageManager.remindClaim(player, null);
             }
             case "set" -> {
                 if (hasNoPermission(sender, "dailyrewards.set")) return;
@@ -110,7 +107,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
                     int amount = Integer.parseInt(args[3]);
 
                     if (amount < 0) {
-                        messageManager.simpleMessage(sender, MessageKeys.COMMAND_INVALID_AMOUNT);
+                        messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_INVALID_AMOUNT);
                         return;
                     }
 
@@ -124,7 +121,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
                         manageHelpMessage(sender);
                     }
                 } catch (NumberFormatException e) {
-                    messageManager.simpleMessage(sender, MessageKeys.COMMAND_INVALID_AMOUNT);
+                    messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_INVALID_AMOUNT);
                 }
 
             }
@@ -134,7 +131,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
                 if (player == null) return;
                 playerId = player.getUniqueId();
                 dataManager.migrate(playerId);
-                messageManager.simpleMessage(sender, MessageKeys.COMMAND_MIGRATE_SUCCESSFUL);
+                messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_MIGRATE_SUCESSFUL);
             }
             default -> manageHelpMessage(sender);
         }
@@ -151,7 +148,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
      */
     private boolean hasNoPermission(CommandSender sender, String permission) {
         if (!sender.hasPermission(permission)) {
-            messageManager.simpleMessage(sender, MessageKeys.COMMAND_NO_PERMISSION);
+            messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_NO_PERMISSION);
             return true;
         }
         return false;
@@ -160,7 +157,7 @@ public class DailyRewardsExecutor implements CommandExecutor {
     private Player getPlayer(CommandSender sender, String name) {
         Player player = Bukkit.getPlayer(name);
         if (player == null) {
-            messageManager.simpleMessage(sender, MessageKeys.COMMAND_INVALID_PLAYER);
+            messageManager.simpleMessage(sender, MessageManager.Extras.COMMAND_INVALID_PLAYER);
             return null;
         }
         return player;
